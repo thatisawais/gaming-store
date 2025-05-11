@@ -34,9 +34,17 @@ EOF
             }
         }
 
+        stage('Clean up existing containers') {
+            steps {
+                // Remove existing containers that could cause name conflicts
+                sh '''
+                    docker ps -a -q --filter "name=ecommerce-app" | xargs --no-run-if-empty docker rm -f
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker-compose down'
                 sh 'docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
             }
         }
