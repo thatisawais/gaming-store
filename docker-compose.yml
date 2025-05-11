@@ -5,15 +5,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: muzzammil759/ecomerce-app:latest  # Optional: helpful if you want to push to Docker Hub
-    container_name: ecommerce-app
+    image: muzzammil759/ecomerce-app-ci:latest     # Unique CI image
+    container_name: ecommerce-app-ci               # Unique container name
     restart: always
     ports:
-      - "3100:3000"
+      - "3100:3000"                                 # Avoid port conflict with Part-I
     env_file:
       - .env
     networks:
-      - app-network
+      - ci-network
     logging:
       driver: "json-file"
       options:
@@ -21,5 +21,5 @@ services:
         max-file: "3"
 
 networks:
-  app-network:
+  ci-network:
     driver: bridge
