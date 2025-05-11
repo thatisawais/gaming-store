@@ -35,9 +35,33 @@ EOF
             }
         }
 
+        stage('Fix Docker Permissions') {
+            steps {
+                script {
+                    // Check if running as root, if not use sudo for docker commands
+                    def isRoot = sh(script: 'id -u', returnStdout: true).trim() == '0'
+                    echo "Running as root: ${isRoot}"
+                    
+                    // Add jenkins user to docker group for this session or use sudo
+                    if (!isRoot) {
+                        sh 'sudo usermod -aG docker jenkins || echo "Could not add jenkins to docker group, will use sudo"'
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
+                script {
+                    // Use sudo if jenkins user doesn't have direct access to docker socket
+                    def canAccessDocker = sh(script: 'docker info >/dev/null 2>&1', returnStatus: true) == 0
+                    
+                    if (canAccessDocker) {
+                        sh 'docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
+                    } else {
+                        sh 'sudo docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
+                    }
+                }
             }
         }
     }
