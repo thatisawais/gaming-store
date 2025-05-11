@@ -24,23 +24,22 @@ CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
 CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
 EOF
                     '''
-                    sh 'ls -la'
                 }
             }
         }
 
-        stage('Clean up existing containers') {
+        stage('Clean up CI container') {
             steps {
+                // Remove only the CI container, not production (Part-I)
                 sh '''
-                    docker-compose down --volumes --remove-orphans || true
-                    docker ps -a -q --filter "name=ecommerce-app" | xargs --no-run-if-empty docker rm -f
+                    docker rm -f ecommerce-app-ci || true
                 '''
             }
         }
 
-        stage('Build & Run Docker Image') {
+        stage('Build & Run CI Container') {
             steps {
-                sh 'docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
+                sh 'docker-compose -p ecommerce_pipeline -f docker-compose.ci.yml up -d --build'
             }
         }
     }
