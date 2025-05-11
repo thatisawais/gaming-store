@@ -1,12 +1,10 @@
 pipeline {
     agent any
-    
+
     environment {
-        // Define environment variables for your build
         CLOUDINARY_CLOUD_NAME = credentials('CLOUDINARY_CLOUD_NAME')
         CLOUDINARY_API_KEY = credentials('CLOUDINARY_API_KEY')
         CLOUDINARY_API_SECRET = credentials('CLOUDINARY_API_SECRET')
-        // Add other environment variables as needed
     }
 
     stages {
@@ -19,16 +17,13 @@ pipeline {
         stage('Create .env file') {
             steps {
                 script {
-                    // Create .env file with required environment variables
                     sh '''
                         cat > .env << EOF
 CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
 CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
 CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
-# Add other environment variables as needed
 EOF
                     '''
-                    // Optional: List directory contents to verify .env was created (remove in production)
                     sh 'ls -la'
                 }
             }
@@ -36,20 +31,18 @@ EOF
 
         stage('Clean up existing containers') {
             steps {
-                // Remove existing containers that could cause name conflicts
                 sh '''
+                    docker-compose down --volumes --remove-orphans || true
                     docker ps -a -q --filter "name=ecommerce-app" | xargs --no-run-if-empty docker rm -f
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Run Docker Image') {
             steps {
                 sh 'docker-compose -p ecommerce_pipeline -f docker-compose.yml up -d --build'
             }
         }
-
-        // Additional stages can be added here, like testing or deploying.
     }
 
     post {

@@ -1,9 +1,11 @@
 version: '3.8'
 
 services:
-  # Node.js application service
   app:
-    image: muzzammil759/ecomerce-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: muzzammil759/ecomerce-app:latest  # Optional: helpful if you want to push to Docker Hub
     container_name: ecommerce-app
     restart: always
     ports:
