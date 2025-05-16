@@ -20,7 +20,7 @@ const cloudinary = require("./util/cloudinaryConfig");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 // ================================Session Store Setting ===================
-//by this our sessions will be stored in the databse
+//by this our sessions will be stored in the database
 const store = new MongoDbStore({
   uri: 'mongodb+srv://muzzammil:admin@cluster0.cqffqdi.mongodb.net/Shop?retryWrites=true&w=majority&appName=Cluster0',
   collection: 'sessions'
